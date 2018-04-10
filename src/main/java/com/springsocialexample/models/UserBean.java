@@ -1,12 +1,14 @@
 package com.springsocialexample.models;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.Value;
 
 import java.io.Serializable;
 
-@Data
+@Value
+@Builder
 public class UserBean implements Serializable {
-    private static final long serialVersionUID = 1L;
     private String firstName;
     private String lastName;
     private String email;

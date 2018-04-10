@@ -2,10 +2,12 @@ package com.springsocialexample.services;
 
 import com.springsocialexample.exceptions.ProviderConnectionException;
 import com.springsocialexample.models.UserBean;
+import com.springsocialexample.utility.ServiceUtil;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.ImageType;
 import org.springframework.social.facebook.api.User;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
@@ -16,10 +18,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Getter
-public class FacebookProviderService implements BaseProviderService{
+public class FacebookProviderService extends BaseProviderService<Facebook> {
     private static final String FACEBOOK = "facebook";
 
+    @Setter
     private String accessToken;
+
     private OAuth2Operations oAuth2Operations;
 
     public FacebookProviderService(@Value("${spring.social.facebook.appId}") String facebookAppId,
@@ -35,32 +39,26 @@ public class FacebookProviderService implements BaseProviderService{
         return getOAuth2Operations().buildAuthorizeUrl(params);
     }
 
-    @Override
-    public UserBean populateUserDetailsFromProvider(Facebook facebook) {
-        User user = facebook.userOperations().getUserProfile();
-        UserBean userBean = new UserBean();
-        userBean.setEmail(user.getEmail());
-        userBean.setFirstName(user.getFirstName());
-        userBean.setLastName(user.getLastName());
-        userBean.setImage(user.getCover().getSource());
-        userBean.setProvider(FACEBOOK);
-        return userBean;
-    }
-
     public String getAccessToken(String code, String url) {
-        try{
-            AccessGrant accessGrant = getOAuth2Operations().exchangeForAccess(code, url, null);
-            accessToken = accessGrant.getAccessToken();
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        AccessGrant accessGrant = getOAuth2Operations().exchangeForAccess(code, url, null);
+        setAccessToken(accessGrant.getAccessToken());
         return getAccessToken();
     }
 
-    public User getName() {
-        Facebook facebook = new FacebookTemplate(accessToken);
-        String[] fields = {"name", "email", "timezone"};
-        return facebook.fetchObject("me", User.class, fields);
+    public UserBean getUserProfile() {
+        return populateUserDetailsFromProvider(new FacebookTemplate(accessToken));
+    }
+
+    @Override
+    protected UserBean populateUserDetailsFromProvider(Facebook providerObject) {
+        String [] fields = { "id", "email",  "first_name", "last_name", "picture"};
+        User user = providerObject.fetchObject("me", User.class, fields);
+        return UserBean.builder()
+            .email(user.getEmail())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .image(ServiceUtil.fetchPictureUrl(user.getId(), ImageType.SQUARE))
+            .provider(FACEBOOK)
+            .build();
     }
 }

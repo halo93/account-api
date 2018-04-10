@@ -1,6 +1,7 @@
 package com.springsocialexample.controllers;
 
 import com.springsocialexample.exceptions.ProviderConnectionException;
+import com.springsocialexample.models.UserBean;
 import com.springsocialexample.services.FacebookProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.facebook.api.User;
@@ -31,8 +32,8 @@ public class LoginController {
         return facebookProviderService.getAccessToken(code, "http://localhost:8080/facebook");
     }
 
-    @GetMapping("/getName")
-    public User getNameResponse(){
-        return facebookProviderService.getName();
+    @GetMapping("/get-user-profile")
+    public UserBean getUserProfile(){
+        return facebookProviderService.getUserProfile();
     }
 }
