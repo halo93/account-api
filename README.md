@@ -1,1 +1,1 @@
-# spring-social-example
+# Account API
