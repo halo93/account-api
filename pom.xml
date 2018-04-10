@@ -61,21 +61,11 @@
 			<artifactId>spring-social-facebook</artifactId>
 			<version>2.0.3.RELEASE</version>
 		</dependency>
-        <dependency>
-            <groupId>org.springframework.social</groupId>
-            <artifactId>spring-social-web</artifactId>
-            <version>1.1.4.RELEASE</version>
-        </dependency>
 		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib</artifactId>
-			<version>3.1</version>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-twitter</artifactId>
+			<version>RELEASE</version>
 		</dependency>
-        <dependency>
-            <groupId>org.springframework.social</groupId>
-            <artifactId>spring-social-facebook-autoconfigure</artifactId>
-            <version>3.0.0.BUILD-SNAPSHOT</version>
-        </dependency>
 	</dependencies>
 	<build>
 		<plugins>
