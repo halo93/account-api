@@ -4,16 +4,13 @@ import com.springsocialexample.exceptions.InvalidTokenException;
 import com.springsocialexample.exceptions.ProviderConnectionException;
 import com.springsocialexample.models.UserBean;
 import com.springsocialexample.utility.ErrorCode;
-import com.springsocialexample.utility.ServiceUtil;
 import com.springsocialexample.utility.SocialType;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.social.facebook.api.ImageType;
 import org.springframework.social.oauth1.AuthorizedRequestToken;
 import org.springframework.social.oauth1.OAuth1Operations;
 import org.springframework.social.oauth1.OAuth1Parameters;
 import org.springframework.social.oauth1.OAuthToken;
-import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.social.twitter.api.Twitter;
 import org.springframework.social.twitter.api.TwitterProfile;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
@@ -29,9 +26,7 @@ public class TwitterProviderService extends BaseProviderService<Twitter> {
     private OAuthToken oAuthToken;
 
     public TwitterProviderService(@Value("${spring.social.twitter.appId}") String appId,
-                                  @Value("${spring.social.twitter.appSecret}") String appSecret,
-                                  @Value("${spring.social.twitter.access.token}") String appAccessToken,
-                                  @Value("${spring.social.twitter.access.token.secret}") String appAccessTokenSecret) {
+                                  @Value("${spring.social.twitter.appSecret}") String appSecret) {
         this.oAuth1Operations = new TwitterConnectionFactory(appId, appSecret).getOAuthOperations();
     }
 
@@ -39,7 +34,7 @@ public class TwitterProviderService extends BaseProviderService<Twitter> {
     public String createAuthorizationURL(String url, String requestToken) throws ProviderConnectionException {
         OAuth1Parameters params = new OAuth1Parameters();
         params.setCallbackUrl(url);
-        if (StringUtils.isEmpty(oAuthToken)){
+        if (StringUtils.isEmpty(oAuthToken)) {
             oAuthToken = oAuth1Operations.fetchRequestToken(url, null);
         }
 
@@ -47,13 +42,12 @@ public class TwitterProviderService extends BaseProviderService<Twitter> {
     }
 
     public String getAccessToken(String token, String verifier) {
-//         Stuck!!!
-        return getOAuth1Operations().exchangeForAccessToken(new AuthorizedRequestToken(oAuthToken, verifier), null).getValue();
+        OAuthToken accessToken = getOAuth1Operations().exchangeForAccessToken(new AuthorizedRequestToken(this.oAuthToken, verifier), null);
+        return accessToken.getValue() + " | " + accessToken.getSecret();
     }
 
-//
-    public UserBean getUserProfile(String accessToken) throws InvalidTokenException {
-        return populateUserDetailsFromProvider(new TwitterTemplate(accessToken));
+    public UserBean getUserProfile(String accessToken, String accessTokenSecret) throws InvalidTokenException {
+        return populateUserDetailsFromProvider(new TwitterTemplate("3BBuR3EiOzwjjh4wDMOVr7E9N", "wTZDICHAgNmKWQ7BtdSefRePZOAL88nfJkp4hIb0gARLlFugAA", accessToken, accessTokenSecret));
     }
 
     @Override
@@ -61,13 +55,14 @@ public class TwitterProviderService extends BaseProviderService<Twitter> {
         try {
             TwitterProfile userProfile = providerObject.userOperations().getUserProfile();
             return UserBean.builder()
-                    .email(userProfile.getName())
+                    .email(userProfile.getScreenName())
                     .firstName(userProfile.getName())
                     .lastName(userProfile.getName())
-//                    .image(ServiceUtil.fetchPictureUrl(userProfile.getId(), ImageType.SQUARE))
+                    .image(userProfile.getProfileImageUrl())
                     .provider(SocialType.TWITTER.getSnsCode())
                     .build();
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new InvalidTokenException(ErrorCode.INVALID_ACCESS_TOKEN.getErrorId(), ErrorCode.INVALID_ACCESS_TOKEN.getErrorMessage());
         }
     }

@@ -6,13 +6,13 @@ import com.springsocialexample.models.Result;
 import com.springsocialexample.models.UserBean;
 import com.springsocialexample.services.FacebookProviderService;
 import com.springsocialexample.services.TwitterProviderService;
-import com.springsocialexample.utility.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.social.facebook.api.User;
-import org.springframework.social.oauth1.OAuthToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin
@@ -45,6 +45,15 @@ public class LoginController {
         return facebookProviderService.getAccessToken(code, String.format("http://localhost:%s/facebook", serverPort));
     }
 
+    @GetMapping("/facebook/get-user-profile")
+    public Result<UserBean> getFacebookUserProfile(@RequestParam("access-token") String accessToken) {
+        try {
+            return new Result<>(HttpStatus.OK.toString(), null, facebookProviderService.getUserProfile(accessToken));
+        } catch (InvalidTokenException e) {
+            return new Result<>(HttpStatus.BAD_REQUEST.toString(), e.getMessage(), null);
+        }
+    }
+
     @GetMapping("login/twitter")
     public String loginViaTwitter() {
         try {
@@ -58,13 +67,12 @@ public class LoginController {
     @GetMapping("/twitter")
     public String createTwitterAccessToken(@RequestParam("oauth_token") String token, @RequestParam("oauth_verifier") String verifier) {
         return twitterProviderService.getAccessToken(token, verifier);
-//        return String.format("%s - %s", token, verifier);
     }
 
-    @GetMapping("/get-user-profile")
-    public Result<UserBean> getUserProfile(@RequestParam("access-token") String accessToken) {
+    @GetMapping("/twitter/get-user-profile")
+    public Result<UserBean> getUserProfile(@RequestParam("access-token") String accessToken, @RequestParam("access-token-secret") String accessTokenSecret) {
         try {
-            return new Result<>(HttpStatus.OK.toString(), null, twitterProviderService.getUserProfile(accessToken));
+            return new Result<>(HttpStatus.OK.toString(), null, twitterProviderService.getUserProfile(accessToken, accessTokenSecret));
         } catch (InvalidTokenException e) {
             return new Result<>(HttpStatus.BAD_REQUEST.toString(), e.getMessage(), null);
         }
