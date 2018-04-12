@@ -7,21 +7,21 @@ import com.springsocialexample.utility.ErrorCode;
 import com.springsocialexample.utility.ServiceUtil;
 import com.springsocialexample.utility.SocialType;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.ImageType;
 import org.springframework.social.facebook.api.User;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
-import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.social.oauth2.OAuth2Operations;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Service;
 
 @Service
 @Getter
-public class FacebookProviderService extends BaseProviderService<Facebook> {
+public class FacebookProviderService implements IBaseProviderService<Facebook> {
+
+    public static final String DEFAULT_PERMISSION = "public_profile, email";
 
     private OAuth2Operations oAuth2Operations;
 
@@ -31,23 +31,25 @@ public class FacebookProviderService extends BaseProviderService<Facebook> {
     }
 
     @Override
-    public String createAuthorizationURL(String url, String scope) throws ProviderConnectionException {
+    public String createAuthorizationURL(String url) throws ProviderConnectionException {
         OAuth2Parameters params = new OAuth2Parameters();
         params.setRedirectUri(url);
-        params.setScope(scope);
+        params.setScope(DEFAULT_PERMISSION);
         return getOAuth2Operations().buildAuthorizeUrl(params);
     }
 
+    @Override
     public String getAccessToken(String code, String uri) {
         return getOAuth2Operations().exchangeForAccess(code, uri, null).getAccessToken();
     }
 
-    public UserBean getUserProfile(String accessToken) throws InvalidTokenException {
-        return populateUserDetailsFromProvider(new FacebookTemplate(accessToken));
+    @Override
+    public UserBean getUserProfile(String accessToken, String accessTokenSecret) throws InvalidTokenException {
+        return getFbUserProfile(accessToken);
     }
 
     @Override
-    protected UserBean populateUserDetailsFromProvider(Facebook providerObject) throws InvalidTokenException {
+    public UserBean populateUserDetailsFromProvider(Facebook providerObject) throws InvalidTokenException {
         String[] fields = {"id", "email", "first_name", "last_name", "picture"};
         try {
             User user = providerObject.fetchObject("me", User.class, fields);
@@ -61,5 +63,14 @@ public class FacebookProviderService extends BaseProviderService<Facebook> {
         } catch (Exception ex) {
             throw new InvalidTokenException(ErrorCode.INVALID_ACCESS_TOKEN.getErrorId(), ErrorCode.INVALID_ACCESS_TOKEN.getErrorMessage());
         }
+    }
+
+    @Override
+    public boolean supports(String providerName) {
+        return SocialType.FACEBOOK.getSnsCode().equals(providerName);
+    }
+
+    private UserBean getFbUserProfile(String accessToken) throws InvalidTokenException {
+        return populateUserDetailsFromProvider(new FacebookTemplate(accessToken));
     }
 }
