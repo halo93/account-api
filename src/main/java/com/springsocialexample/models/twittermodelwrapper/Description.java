@@ -1,5 +1,5 @@
 
-package com.springsocialexample.models;
+package com.springsocialexample.models.twittermodelwrapper;
 
 import java.io.Serializable;
 import java.util.List;

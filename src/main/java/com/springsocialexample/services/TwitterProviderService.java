@@ -1,25 +1,18 @@
 package com.springsocialexample.services;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springsocialexample.exceptions.InvalidTokenException;
 import com.springsocialexample.exceptions.ProviderConnectionException;
-import com.springsocialexample.models.TwitterProfileWrapper;
 import com.springsocialexample.models.UserBean;
+import com.springsocialexample.models.twittermodelwrapper.TwitterProfileWrapper;
 import com.springsocialexample.utility.ErrorCode;
 import com.springsocialexample.utility.SocialType;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.oauth1.AuthorizedRequestToken;
 import org.springframework.social.oauth1.OAuth1Operations;
 import org.springframework.social.oauth1.OAuth1Parameters;
 import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.twitter.api.Twitter;
-import org.springframework.social.twitter.api.TwitterObject;
-import org.springframework.social.twitter.api.TwitterProfile;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 import org.springframework.social.twitter.connect.TwitterConnectionFactory;
 import org.springframework.stereotype.Service;
