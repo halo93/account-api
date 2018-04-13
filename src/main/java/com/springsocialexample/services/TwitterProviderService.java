@@ -16,7 +16,6 @@ import org.springframework.social.twitter.api.Twitter;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 import org.springframework.social.twitter.connect.TwitterConnectionFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 @Service
 @Data
@@ -41,9 +40,8 @@ public class TwitterProviderService implements IBaseProviderService<Twitter> {
     public String createAuthorizationURL(String url) throws ProviderConnectionException {
         OAuth1Parameters params = new OAuth1Parameters();
         params.setCallbackUrl(url);
-        if (StringUtils.isEmpty(getOAuthToken())) {
-            setOAuthToken(getOAuth1Operations().fetchRequestToken(url, null));
-        }
+        setOAuthToken(getOAuth1Operations().fetchRequestToken(url, null));
+
         return getOAuth1Operations().buildAuthorizeUrl(getOAuthToken().getValue(), params);
     }
 

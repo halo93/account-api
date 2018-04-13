@@ -115,6 +115,8 @@ public class TwitterProfileWrapper {
     public String profileImageUrl;
     @JsonProperty("profile_image_url_https")
     public String profileImageUrlHttps;
+    @JsonProperty("profile_banner_url")
+    public String profileBannerUrl;
     @JsonProperty("profile_link_color")
     public String profileLinkColor;
     @JsonProperty("profile_sidebar_border_color")

@@ -30,8 +30,8 @@ public class LoginController {
         try {
             return new Result<>(HttpStatus.OK.toString(), 
                 HttpStatus.OK.getReasonPhrase(), 
-                //snsServiceFactory.get(snsCode).createAuthorizationURL(String.format("%s%s/%s", serverDomain, rootContextPath, snsCode)));
-                snsServiceFactory.get(snsCode).createAuthorizationURL(String.format("http://localhost:3000", snsCode)));
+//                snsServiceFactory.get(snsCode).createAuthorizationURL(String.format("%s%s/%s", serverDomain, rootContextPath, snsCode)));
+                snsServiceFactory.get(snsCode).createAuthorizationURL(String.format("https://9f5c42d7.ngrok.io", snsCode)));
         } catch (ProviderConnectionException e) {
             return new Result<>(HttpStatus.BAD_REQUEST.toString(), e.getMessage(), null);
         }
