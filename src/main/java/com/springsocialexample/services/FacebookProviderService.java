@@ -13,6 +13,7 @@ import org.springframework.social.facebook.api.ImageType;
 import org.springframework.social.facebook.api.User;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
+import org.springframework.social.oauth2.GrantType;
 import org.springframework.social.oauth2.OAuth2Operations;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Service;
@@ -31,11 +32,11 @@ public class FacebookProviderService implements IBaseProviderService<Facebook> {
     }
 
     @Override
-    public String createAuthorizationURL(String url) throws ProviderConnectionException {
+    public String createAuthorizationURL(GrantType grantType, String url) throws ProviderConnectionException {
         OAuth2Parameters params = new OAuth2Parameters();
         params.setRedirectUri(url);
         params.setScope(DEFAULT_PERMISSION);
-        return getOAuth2Operations().buildAuthorizeUrl(params);
+        return getOAuth2Operations().buildAuthorizeUrl(GrantType.IMPLICIT_GRANT, params);
     }
 
     @Override

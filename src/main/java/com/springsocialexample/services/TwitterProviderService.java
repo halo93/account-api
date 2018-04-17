@@ -12,6 +12,7 @@ import org.springframework.social.oauth1.AuthorizedRequestToken;
 import org.springframework.social.oauth1.OAuth1Operations;
 import org.springframework.social.oauth1.OAuth1Parameters;
 import org.springframework.social.oauth1.OAuthToken;
+import org.springframework.social.oauth2.GrantType;
 import org.springframework.social.twitter.api.Twitter;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 import org.springframework.social.twitter.connect.TwitterConnectionFactory;
@@ -37,7 +38,7 @@ public class TwitterProviderService implements IBaseProviderService<Twitter> {
     }
 
     @Override
-    public String createAuthorizationURL(String url) throws ProviderConnectionException {
+    public String createAuthorizationURL(GrantType grantType, String url) throws ProviderConnectionException {
         OAuth1Parameters params = new OAuth1Parameters();
         params.setCallbackUrl(url);
         setOAuthToken(getOAuth1Operations().fetchRequestToken(url, null));

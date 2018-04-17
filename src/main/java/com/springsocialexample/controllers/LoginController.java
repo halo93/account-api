@@ -9,6 +9,7 @@ import com.springsocialexample.utility.SocialType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.social.oauth2.GrantType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +32,7 @@ public class LoginController {
             return new Result<>(HttpStatus.OK.toString(), 
                 HttpStatus.OK.getReasonPhrase(), 
 //                snsServiceFactory.get(snsCode).createAuthorizationURL(String.format("%s%s/%s", serverDomain, rootContextPath, snsCode)));
-                snsServiceFactory.get(snsCode).createAuthorizationURL(String.format("https://9f5c42d7.ngrok.io", snsCode)));
+                snsServiceFactory.get(snsCode).createAuthorizationURL(GrantType.IMPLICIT_GRANT, "https://www.facebook.com/connect/login_success.html"));
         } catch (ProviderConnectionException e) {
             return new Result<>(HttpStatus.BAD_REQUEST.toString(), e.getMessage(), null);
         }
