@@ -5,13 +5,15 @@ import com.springsocialexample.exceptions.ProviderConnectionException;
 import com.springsocialexample.models.Result;
 import com.springsocialexample.models.UserBean;
 import com.springsocialexample.services.factory.SnsServiceFactory;
-import com.springsocialexample.utility.SocialType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.social.oauth2.GrantType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import static com.springsocialexample.utility.SocialType.FACEBOOK;
+import static com.springsocialexample.utility.SocialType.TWITTER;
 
 @RestController
 @CrossOrigin
@@ -29,10 +31,7 @@ public class LoginController {
     @GetMapping("/sns/start/via/{sns_code}")
     public Result<String> startLoginViaSns(@PathVariable("sns_code") String snsCode) {
         try {
-            return new Result<>(HttpStatus.OK.toString(), 
-                HttpStatus.OK.getReasonPhrase(), 
-//                snsServiceFactory.get(snsCode).createAuthorizationURL(String.format("%s%s/%s", serverDomain, rootContextPath, snsCode)));
-                snsServiceFactory.get(snsCode).createAuthorizationURL(GrantType.IMPLICIT_GRANT, "https://www.facebook.com/connect/login_success.html"));
+            return getAuthorizationUrlResult(snsCode);
         } catch (ProviderConnectionException e) {
             return new Result<>(HttpStatus.BAD_REQUEST.toString(), e.getMessage(), null);
         }
@@ -49,7 +48,7 @@ public class LoginController {
     public Result<String> createFacebookAccessToken(@RequestParam("code") String code) {
         return new Result<>(HttpStatus.OK.toString(),
             HttpStatus.OK.getReasonPhrase(),
-            snsServiceFactory.get(SocialType.FACEBOOK.getSnsCode())
+            snsServiceFactory.get(FACEBOOK.getSnsCode())
                     .getAccessToken(code, String.format("%s%s/facebook", serverDomain, rootContextPath)));
     }
 
@@ -57,7 +56,7 @@ public class LoginController {
     public Result<String> createTwitterAccessToken(@RequestParam("oauth_token") String token, @RequestParam("oauth_verifier") String verifier) {
         return new Result<>(HttpStatus.OK.toString(),
             HttpStatus.OK.getReasonPhrase(),
-            snsServiceFactory.get(SocialType.TWITTER.getSnsCode()).getAccessToken(token, verifier));
+            snsServiceFactory.get(TWITTER.getSnsCode()).getAccessToken(token, verifier));
     }
 
     private Result<UserBean> getOAuth2UserProfile(String snsCode, String accessToken) {
@@ -76,4 +75,19 @@ public class LoginController {
         }
     }
 
+    private Result<String> getAuthorizationUrlResult(String snsCode)
+            throws ProviderConnectionException {
+        String authorizationURL = "";
+        switch (snsCode){
+            case "facebook":
+                authorizationURL = snsServiceFactory.get(snsCode).createAuthorizationURL(GrantType.IMPLICIT_GRANT,"https://813dbc16.ngrok.io/account/v1/facebook-callback");
+                break;
+            case "twitter":
+                authorizationURL = snsServiceFactory.get(snsCode).createAuthorizationURL(null,"https://813dbc16.ngrok.io/account/v1/twitter-callback");
+                break;
+            default:
+                return new Result<>(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST.getReasonPhrase(), null);
+        }
+        return new Result<>(HttpStatus.OK.toString(), HttpStatus.OK.getReasonPhrase(), authorizationURL);
+    }
 }
