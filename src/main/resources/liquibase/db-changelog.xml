@@ -25,4 +25,10 @@
     <changeSet id="add-mock-account" author="LongDH">
         <sqlFile path="./account.sql" relativeToChangelogFile="true"/>
     </changeSet>
+    <changeSet id="add-provider-column" author="VuTA">
+        <addColumn tableName="account">
+            <column name="provider" type="varchar(20)">
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
