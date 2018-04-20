@@ -18,4 +18,5 @@ public class UserBean implements Serializable {
     private String passwordConfirm;
     private String provider;
     private String image;
+    private String apiToken;
 }

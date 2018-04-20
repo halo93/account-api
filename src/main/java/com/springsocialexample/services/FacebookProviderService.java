@@ -3,6 +3,7 @@ package com.springsocialexample.services;
 import com.springsocialexample.exceptions.InvalidTokenException;
 import com.springsocialexample.exceptions.ProviderConnectionException;
 import com.springsocialexample.models.UserBean;
+import com.springsocialexample.security.JWTSecurityUtil;
 import com.springsocialexample.utility.ErrorCode;
 import com.springsocialexample.utility.ServiceUtil;
 import com.springsocialexample.utility.SocialType;
@@ -60,6 +61,7 @@ public class FacebookProviderService implements IBaseProviderService<Facebook> {
                     .lastName(user.getLastName())
                     .image(ServiceUtil.fetchPictureUrl(user.getId(), ImageType.SQUARE))
                     .provider(SocialType.FACEBOOK.getSnsCode())
+                    .apiToken(JWTSecurityUtil.generateApiToken(user.getEmail()))
                     .build();
         } catch (Exception ex) {
             throw new InvalidTokenException(ErrorCode.INVALID_ACCESS_TOKEN.getErrorId(), ErrorCode.INVALID_ACCESS_TOKEN.getErrorMessage());
